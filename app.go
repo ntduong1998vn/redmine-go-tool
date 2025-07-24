@@ -8,6 +8,9 @@ import (
 
 	_ "github.com/go-sql-driver/mysql"
 	"github.com/joho/godotenv"
+
+	"redmine-go-app/backend/app/redmine" // Update this path to match your actual module path
+	"redmine-go-app/backend/models"
 )
 
 // App struct
@@ -41,4 +44,16 @@ func (a *App) startup(ctx context.Context) {
 // Greet returns a greeting for the given name
 func (a *App) Greet(name string) string {
 	return fmt.Sprintf("Hello %s, It's show time!", name)
+}
+
+func (a *App) FetchRedmineProjects() ([]models.Project, error) {
+	// redmineAPIKey := os.Getenv("REDMINE_API_KEY")
+	// if redmineAPIKey == "" {
+	// 	return nil, fmt.Errorf("REDMINE_API_KEY not set in environment variables")
+	// }
+	projects, err := redmine.GetProjectList()
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch Redmine projects: %w", err)
+	}
+	return projects, nil
 }
