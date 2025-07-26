@@ -15,14 +15,17 @@ type ProjectsResponse struct {
 	Projects []models.Project `json:"projects"`
 }
 
+const RedmineUrl = "https://redmine.splus-software.com"
+const AccessKey = "cad5eb98b070c1ee75330031c0e34ed4cd412eb1"
+
 // getProjectList gọi API Redmine để lấy danh sách project
 func GetProjectList() ([]models.Project, error) {
-	url := "https://redmine.splus-software.com/projects.json"
+	url := fmt.Sprintf("%s/projects.json", RedmineUrl)
 	req, err := http.NewRequest("GET", url, nil)
 	if err != nil {
 		return nil, err
 	}
-	req.Header.Set("X-Redmine-API-Key", "cad5eb98b070c1ee75330031c0e34ed4cd412eb1")
+	req.Header.Set("X-Redmine-API-Key", AccessKey)
 
 	client := &http.Client{}
 	resp, err := client.Do(req)
@@ -41,4 +44,33 @@ func GetProjectList() ([]models.Project, error) {
 	}
 
 	return result.Projects, nil
+}
+
+func GetProjectMemberships(projectID int) ([]models.Membership, error) {
+	url := fmt.Sprintf("%s/projects/%d/memberships.json", RedmineUrl, projectID)
+	req, err := http.NewRequest("GET", url, nil)
+	if err != nil {
+		return nil, err
+	}
+	req.Header.Set("X-Redmine-API-Key", AccessKey)
+
+	client := &http.Client{}
+	resp, err := client.Do(req)
+	if err != nil {
+		return nil, err
+	}
+	defer resp.Body.Close()
+
+	if resp.StatusCode != http.StatusOK {
+		return nil, fmt.Errorf("redmine API returned status: %s", resp.Status)
+	}
+
+	var membershipsResponse struct {
+		Memberships []models.Membership `json:"memberships"`
+	}
+	if err := json.NewDecoder(resp.Body).Decode(&membershipsResponse); err != nil {
+		return nil, err
+	}
+
+	return membershipsResponse.Memberships, nil
 }

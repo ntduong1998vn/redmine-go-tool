@@ -1,7 +1,10 @@
 <script lang="ts">
 	import { FetchRedmineProjects } from '$lib/wailsjs/go/main/App';
-	// If using Lucide icons, import here (optional)
-	// import IconFolder from '@lucide/svelte/icons/folder';
+	import { goto } from '$app/navigation';
+
+	function goToProjectDetail(id: number) {
+		goto(`/projects/${id}`);
+	}
 </script>
 
 <section class="space-y-6">
@@ -24,8 +27,10 @@
 				</div>
 			{:else}
 				{#each projects as project}
-					<div
-						class="card preset-filled-primary-100-900 hover:border-primary-500 flex cursor-pointer flex-col gap-2 border border-transparent p-6 transition-all duration-200 hover:scale-105 hover:shadow-xl"
+					<button
+						type="button"
+						class="card preset-filled-primary-100-900 hover:border-primary-500 flex cursor-pointer flex-col gap-2 border border-transparent p-6 transition-all duration-200 hover:scale-105 hover:shadow-xl text-left"
+						on:click={() => goToProjectDetail(project.id)}
 					>
 						<h3 class="preset-typo-title mb-2 flex items-center gap-2">
 							<!-- <IconFolder size={20} /> -->
@@ -33,7 +38,7 @@
 						</h3>
 						<p class="text-sm opacity-60">ID: <span class="font-mono">{project.id}</span></p>
 						<p class="text-sm">{project.description}</p>
-					</div>
+					</button>
 				{/each}
 			{/if}
 		{:catch error}

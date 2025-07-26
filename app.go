@@ -57,3 +57,11 @@ func (a *App) FetchRedmineProjects() ([]models.Project, error) {
 	}
 	return projects, nil
 }
+
+func (a *App) FetchProjectMemberships(projectID int) ([]models.Membership, error) {
+	memberships, err := redmine.GetProjectMemberships(projectID)
+	if err != nil {
+		return nil, fmt.Errorf("failed to fetch memberships for project %d: %w", projectID, err)
+	}
+	return memberships, nil
+}
